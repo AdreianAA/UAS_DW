@@ -1,5 +1,4 @@
 <?php
-
 include '../config/koneksi.php';
 
 /*
@@ -9,28 +8,23 @@ TOTAL PENJUALAN PER PRODUK
 ====================================
 */
 
-$q1 = mysqli_query($conn,"
+$q_produk = mysqli_query($conn,"
 SELECT
-p.nama_produk,
-SUM(f.jumlah) AS total_terjual,
-SUM(f.total_harga) AS total_pendapatan
-
+    p.nama_produk,
+    SUM(f.total_harga) AS total_pendapatan
 FROM fact_penjualan f
-
-JOIN dim_produk p
+INNER JOIN dim_produk p
 ON f.id_produk = p.id_produk
-
-GROUP BY p.nama_produk
+GROUP BY p.id_produk, p.nama_produk
+ORDER BY total_pendapatan DESC
 ");
 
 $produk = [];
 $pendapatan_produk = [];
 
-while($d=mysqli_fetch_assoc($q1)){
-
-    $produk[] = $d['nama_produk'];
-    $pendapatan_produk[] = $d['total_pendapatan'];
-
+while($row = mysqli_fetch_assoc($q_produk)){
+    $produk[] = $row['nama_produk'];
+    $pendapatan_produk[] = $row['total_pendapatan'];
 }
 
 /*
@@ -40,33 +34,24 @@ TREN PENJUALAN BULANAN
 ====================================
 */
 
-$q2 = mysqli_query($conn,"
+$q_bulan = mysqli_query($conn,"
 SELECT
-w.bulan_nama,
-SUM(f.total_harga) AS total_pendapatan
-
+    w.bulan,
+    w.bulan_nama,
+    SUM(f.total_harga) AS total_pendapatan
 FROM fact_penjualan f
-
-JOIN dim_waktu w
+INNER JOIN dim_waktu w
 ON f.id_waktu = w.id_waktu
-
-GROUP BY
-w.tahun,
-w.bulan
-
-ORDER BY
-w.tahun,
-w.bulan
+GROUP BY w.bulan, w.bulan_nama
+ORDER BY w.bulan
 ");
 
 $bulan = [];
 $pendapatan_bulan = [];
 
-while($d=mysqli_fetch_assoc($q2)){
-
-    $bulan[] = $d['bulan_nama'];
-    $pendapatan_bulan[] = $d['total_pendapatan'];
-
+while($row = mysqli_fetch_assoc($q_bulan)){
+    $bulan[] = $row['bulan_nama'];
+    $pendapatan_bulan[] = $row['total_pendapatan'];
 }
 
 /*
@@ -76,38 +61,28 @@ TOP PELANGGAN
 ====================================
 */
 
-$q3 = mysqli_query($conn,"
+$q_pelanggan = mysqli_query($conn,"
 SELECT
-
-p.nama_pelanggan,
-
-SUM(f.total_harga)
-AS total_belanja,
-
-COUNT(f.id_penjualan)
-AS jumlah_transaksi
-
+    p.nama_pelanggan,
+    SUM(f.total_harga) AS total_belanja,
+    COUNT(f.id_penjualan) AS jumlah_transaksi
 FROM fact_penjualan f
-
-JOIN dim_pelanggan p
+INNER JOIN dim_pelanggan p
 ON f.id_pelanggan = p.id_pelanggan
-
-GROUP BY p.nama_pelanggan
-
+GROUP BY p.id_pelanggan, p.nama_pelanggan
 ORDER BY total_belanja DESC
 ");
-
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
 
-<title>Dashboard Data Warehouse</title>
+    <title>Dashboard Data Warehouse</title>
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </head>
 
@@ -118,19 +93,17 @@ ORDER BY total_belanja DESC
 <div class="container mt-4">
 
     <h2 class="mb-4">
-        Dashboard Data Warehouse
+        Dashboard Data Warehouse Retail
     </h2>
 
     <div class="row">
 
-        <div class="col-md-6">
+        <div class="col-md-6 mb-4">
 
-            <div class="card">
+            <div class="card shadow">
 
                 <div class="card-header bg-primary text-white">
-
                     Total Penjualan per Produk
-
                 </div>
 
                 <div class="card-body">
@@ -143,14 +116,12 @@ ORDER BY total_belanja DESC
 
         </div>
 
-        <div class="col-md-6">
+        <div class="col-md-6 mb-4">
 
-            <div class="card">
+            <div class="card shadow">
 
                 <div class="card-header bg-success text-white">
-
-                    Tren Penjualan per Bulan
-
+                    Tren Penjualan Bulanan
                 </div>
 
                 <div class="card-body">
@@ -165,29 +136,23 @@ ORDER BY total_belanja DESC
 
     </div>
 
-    <br>
-
-    <div class="card">
+    <div class="card shadow">
 
         <div class="card-header bg-dark text-white">
-
             Pelanggan Dengan Belanja Tertinggi
-
         </div>
 
         <div class="card-body">
 
-            <table class="table table-bordered">
+            <table class="table table-bordered table-striped">
 
-                <thead>
+                <thead class="table-dark">
 
                 <tr>
-
                     <th>No</th>
                     <th>Nama Pelanggan</th>
                     <th>Total Belanja</th>
                     <th>Jumlah Transaksi</th>
-
                 </tr>
 
                 </thead>
@@ -195,24 +160,24 @@ ORDER BY total_belanja DESC
                 <tbody>
 
                 <?php
+                $no = 1;
 
-                $no=1;
-
-                while($row=mysqli_fetch_assoc($q3)){
-
+                while($row = mysqli_fetch_assoc($q_pelanggan)){
                 ?>
 
                 <tr>
 
-                    <td><?= $no++ ?></td>
+                    <td><?= $no++; ?></td>
 
-                    <td><?= $row['nama_pelanggan'] ?></td>
+                    <td><?= $row['nama_pelanggan']; ?></td>
 
                     <td>
-                        Rp <?= number_format($row['total_belanja'],0,',','.') ?>
+                        Rp <?= number_format($row['total_belanja'],0,',','.'); ?>
                     </td>
 
-                    <td><?= $row['jumlah_transaksi'] ?></td>
+                    <td>
+                        <?= $row['jumlah_transaksi']; ?>
+                    </td>
 
                 </tr>
 
@@ -231,60 +196,69 @@ ORDER BY total_belanja DESC
 <script>
 
 /*
-====================================
-BAR CHART PRODUK
-====================================
+=================================
+GRAFIK PRODUK
+=================================
 */
 
 new Chart(
 document.getElementById('chartProduk'),
 {
-    type:'bar',
+    type: 'bar',
 
-    data:{
+    data: {
 
         labels:
         <?= json_encode($produk); ?>,
 
-        datasets:[{
+        datasets: [{
 
-            label:'Pendapatan',
+            label: 'Total Pendapatan',
 
             data:
-            <?= json_encode($pendapatan_produk); ?>
+            <?= json_encode($pendapatan_produk); ?>,
+
+            borderWidth: 1
 
         }]
+    },
+
+    options: {
+        responsive: true
     }
 }
 );
 
 /*
-====================================
-LINE CHART BULANAN
-====================================
+=================================
+GRAFIK BULANAN
+=================================
 */
 
 new Chart(
 document.getElementById('chartBulan'),
 {
-    type:'line',
+    type: 'line',
 
-    data:{
+    data: {
 
         labels:
         <?= json_encode($bulan); ?>,
 
-        datasets:[{
+        datasets: [{
 
-            label:'Pendapatan',
+            label: 'Pendapatan',
 
             data:
             <?= json_encode($pendapatan_bulan); ?>,
 
-            fill:false,
-            tension:0.3
-
+            borderWidth: 2,
+            tension: 0.3
         }]
+    },
+
+    options: {
+        responsive: true
     }
 }
 );

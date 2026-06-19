@@ -11,6 +11,8 @@ include '../config/koneksi.php';
 </head>
 <body>
 
+<?php include '../navbar.php'; ?>
+
 <div class="container mt-4">
 
     <h3>Data Pelanggan</h3>
