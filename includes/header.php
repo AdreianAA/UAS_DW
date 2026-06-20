@@ -46,7 +46,7 @@ function dwOpen($menu, $target){ return $menu === $target ? ' open' : ''; }
         <!-- Dashboard -->
         <div class="nav-group">
             <a class="nav-top-link no-children<?= dwActive($active_menu,'dashboard') ?>"
-               href="<?= $base ?>dashboard/index.php">
+               href="<?= $base ?>index.php">
                 <i class="bi bi-grid-1x2-fill"></i> Dashboard
             </a>
         </div>
@@ -112,10 +112,6 @@ function dwOpen($menu, $target){ return $menu === $target ? ' open' : ''; }
             </button>
             <div class="topbar-title"><?= htmlspecialchars($page_title) ?></div>
 
-            <div class="topbar-right">
-                <button class="icon-btn"><i class="bi bi-bell-fill"></i><span class="dot"></span></button>
-                <div class="avatar-circle"><i class="bi bi-person-fill"></i></div>
-            </div>
         </header>
 
         <main class="content">
