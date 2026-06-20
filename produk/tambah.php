@@ -1,121 +1,84 @@
 <?php
 include '../config/koneksi.php';
 
+$error = '';
+
 if(isset($_POST['simpan'])){
 
-    $kode_produk = $_POST['kode_produk'];
-    $nama_produk = $_POST['nama_produk'];
-    $kategori = $_POST['kategori'];
-    $harga = $_POST['harga'];
+    $kode_produk = mysqli_real_escape_string($conn, $_POST['kode_produk']);
+    $nama_produk = mysqli_real_escape_string($conn, $_POST['nama_produk']);
+    $kategori    = mysqli_real_escape_string($conn, $_POST['kategori']);
+    $harga       = mysqli_real_escape_string($conn, $_POST['harga']);
 
-    mysqli_query(
-        $conn,
-        "INSERT INTO dim_produk
-        (
-            kode_produk,
-            nama_produk,
-            kategori,
-            harga
-        )
-        VALUES
-        (
-            '$kode_produk',
-            '$nama_produk',
-            '$kategori',
-            '$harga'
-        )"
-    );
-
-    header("Location:index.php");
+    if($kode_produk === '' || $nama_produk === '' || $harga === ''){
+        $error = 'Semua field wajib diisi.';
+    } else {
+        mysqli_query($conn, "
+            INSERT INTO dim_produk (kode_produk, nama_produk, kategori, harga)
+            VALUES ('$kode_produk', '$nama_produk', '$kategori', '$harga')
+        ");
+        header("Location:index.php?msg=added");
+        exit;
+    }
 }
+
+$base = '../';
+$page_title = 'Tambah Produk';
+$active_menu = 'produk';
+$active_sub  = 'tambah';
+include '../includes/header.php';
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-
-<title>Tambah Produk</title>
-
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-</head>
-<body>
-
-<?php include '../navbar.php'; ?>
-
-<div class="container mt-4">
-
-<h3>Tambah Produk</h3>
-
-<form method="POST">
-
-<div class="mb-3">
-
-<label>Kode Produk</label>
-
-<input type="text"
-       name="kode_produk"
-       class="form-control"
-       required>
-
+<div class="page-heading">
+    <div>
+        <h2>Tambah Produk</h2>
+        <p>Tambahkan data produk baru ke dimensi produk</p>
+    </div>
 </div>
 
-<div class="mb-3">
+<div class="surface-card form-shell">
 
-<label>Nama Produk</label>
+    <?php if($error): ?>
+        <div class="alert-app danger"><i class="bi bi-exclamation-circle me-1"></i><?= $error ?></div>
+    <?php endif; ?>
 
-<input type="text"
-       name="nama_produk"
-       class="form-control"
-       required>
+    <form method="POST">
 
+        <div class="field">
+            <label>Kode Produk</label>
+            <input type="text" name="kode_produk" class="form-control" placeholder="Contoh: PR006"
+                   value="<?= isset($_POST['kode_produk']) ? htmlspecialchars($_POST['kode_produk']) : '' ?>" required>
+        </div>
+
+        <div class="field">
+            <label>Nama Produk</label>
+            <input type="text" name="nama_produk" class="form-control" placeholder="Contoh: Baju Polos Biru"
+                   value="<?= isset($_POST['nama_produk']) ? htmlspecialchars($_POST['nama_produk']) : '' ?>" required>
+        </div>
+
+        <div class="field">
+            <label>Kategori</label>
+            <select name="kategori" class="form-select">
+                <option value="Elektronik">Elektronik</option>
+                <option value="Pakaian">Pakaian</option>
+                <option value="Makanan">Makanan</option>
+                <option value="Aksesoris">Aksesoris</option>
+            </select>
+        </div>
+
+        <div class="field">
+            <label>Harga</label>
+            <input type="number" name="harga" class="form-control" placeholder="0" min="0" required>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" name="simpan" class="btn-app-primary">
+                <i class="bi bi-check-lg"></i> Simpan
+            </button>
+            <a href="index.php" class="btn-app-cancel">Batal</a>
+        </div>
+
+    </form>
 </div>
 
-<div class="mb-3">
-
-<label>Kategori</label>
-
-<select name="kategori"
-        class="form-control">
-
-<option>Elektronik</option>
-<option>Pakaian</option>
-<option>Makanan</option>
-<option>Aksesoris</option>
-
-</select>
-
-</div>
-
-<div class="mb-3">
-
-<label>Harga</label>
-
-<input type="number"
-       name="harga"
-       class="form-control"
-       required>
-
-</div>
-
-<button type="submit"
-        name="simpan"
-        class="btn btn-success">
-
-Simpan
-
-</button>
-
-<a href="index.php"
-   class="btn btn-secondary">
-
-Kembali
-
-</a>
-
-</form>
-
-</div>
-
-</body>
-</html>
+<?php include '../includes/footer.php'; ?>

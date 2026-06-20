@@ -1,122 +1,98 @@
 <?php
-
 include '../config/koneksi.php';
 
-$id = $_GET['id'];
+$id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 $data = mysqli_fetch_assoc(
-
-    mysqli_query(
-        $conn,
-        "SELECT * FROM dim_produk
-         WHERE id_produk='$id'"
-    )
+    mysqli_query($conn, "SELECT * FROM dim_produk WHERE id_produk='$id'")
 );
+
+if(!$data){
+    header("Location:index.php");
+    exit;
+}
+
+$error = '';
 
 if(isset($_POST['update'])){
 
-    $kode_produk = $_POST['kode_produk'];
-    $nama_produk = $_POST['nama_produk'];
-    $kategori = $_POST['kategori'];
-    $harga = $_POST['harga'];
+    $kode_produk = mysqli_real_escape_string($conn, $_POST['kode_produk']);
+    $nama_produk = mysqli_real_escape_string($conn, $_POST['nama_produk']);
+    $kategori    = mysqli_real_escape_string($conn, $_POST['kategori']);
+    $harga       = mysqli_real_escape_string($conn, $_POST['harga']);
 
-    mysqli_query(
-        $conn,
-        "UPDATE dim_produk SET
-
-        kode_produk='$kode_produk',
-        nama_produk='$nama_produk',
-        kategori='$kategori',
-        harga='$harga'
-
-        WHERE id_produk='$id'"
-    );
-
-    header("Location:index.php");
+    if($kode_produk === '' || $nama_produk === '' || $harga === ''){
+        $error = 'Semua field wajib diisi.';
+    } else {
+        mysqli_query($conn, "
+            UPDATE dim_produk SET
+                kode_produk='$kode_produk',
+                nama_produk='$nama_produk',
+                kategori='$kategori',
+                harga='$harga'
+            WHERE id_produk='$id'
+        ");
+        header("Location:index.php?msg=updated");
+        exit;
+    }
 }
+
+$kategori_options = ['Elektronik','Pakaian','Makanan','Aksesoris'];
+
+$base = '../';
+$page_title = 'Edit Produk';
+$active_menu = 'produk';
+$active_sub  = 'tabel';
+include '../includes/header.php';
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-
-<title>Edit Produk</title>
-
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-</head>
-<body>
-
-<?php include '../navbar.php'; ?>
-
-<div class="container mt-4">
-
-<h3>Edit Produk</h3>
-
-<form method="POST">
-
-<div class="mb-3">
-
-<label>Kode Produk</label>
-
-<input type="text"
-       name="kode_produk"
-       value="<?= $data['kode_produk']; ?>"
-       class="form-control">
-
+<div class="page-heading">
+    <div>
+        <h2>Edit Produk</h2>
+        <p>Perbarui data produk: <?= htmlspecialchars($data['nama_produk']) ?></p>
+    </div>
 </div>
 
-<div class="mb-3">
+<div class="surface-card form-shell">
 
-<label>Nama Produk</label>
+    <?php if($error): ?>
+        <div class="alert-app danger"><i class="bi bi-exclamation-circle me-1"></i><?= $error ?></div>
+    <?php endif; ?>
 
-<input type="text"
-       name="nama_produk"
-       value="<?= $data['nama_produk']; ?>"
-       class="form-control">
+    <form method="POST">
 
+        <div class="field">
+            <label>Kode Produk</label>
+            <input type="text" name="kode_produk" class="form-control" value="<?= htmlspecialchars($data['kode_produk']) ?>" required>
+        </div>
+
+        <div class="field">
+            <label>Nama Produk</label>
+            <input type="text" name="nama_produk" class="form-control" value="<?= htmlspecialchars($data['nama_produk']) ?>" required>
+        </div>
+
+        <div class="field">
+            <label>Kategori</label>
+            <select name="kategori" class="form-select">
+                <?php foreach($kategori_options as $opt): ?>
+                    <option value="<?= $opt ?>" <?= $data['kategori']===$opt?'selected':'' ?>><?= $opt ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+
+        <div class="field">
+            <label>Harga</label>
+            <input type="number" name="harga" class="form-control" min="0" value="<?= htmlspecialchars($data['harga']) ?>" required>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" name="update" class="btn-app-primary">
+                <i class="bi bi-check-lg"></i> Update
+            </button>
+            <a href="index.php" class="btn-app-cancel">Batal</a>
+        </div>
+
+    </form>
 </div>
 
-<div class="mb-3">
-
-<label>Kategori</label>
-
-<input type="text"
-       name="kategori"
-       value="<?= $data['kategori']; ?>"
-       class="form-control">
-
-</div>
-
-<div class="mb-3">
-
-<label>Harga</label>
-
-<input type="number"
-       name="harga"
-       value="<?= $data['harga']; ?>"
-       class="form-control">
-
-</div>
-
-<button type="submit"
-        name="update"
-        class="btn btn-primary">
-
-Update
-
-</button>
-
-<a href="index.php"
-   class="btn btn-secondary">
-
-Kembali
-
-</a>
-
-</form>
-
-</div>
-
-</body>
-</html>
+<?php include '../includes/footer.php'; ?>
