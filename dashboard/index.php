@@ -75,7 +75,7 @@ $active_menu = 'dashboard';
 include '../includes/header.php';
 ?>
 
-<div class="page-heading">
+<div class="page-heading mb-4 align-items-center">
     <div>
         <h2>Dashboard</h2>
         <p>Ringkasan performa penjualan dari Data Warehouse Retail</p>
@@ -93,7 +93,7 @@ include '../includes/header.php';
     </form>
 </div>
 
-<div class="stat-strip">
+<div class="stat-strip mb-4">
     <div class="stat-card">
         <div class="stat-icon" style="background:#E8ECFF;color:#3D5AFE;"><i class="bi bi-box-seam-fill"></i></div>
         <div class="stat-label">Total Produk</div>
@@ -116,7 +116,7 @@ include '../includes/header.php';
     </div>
 </div>
 
-<div class="row g-3">
+<div class="row g-4 mb-4">
     <div class="col-lg-6">
         <div class="surface-card h-100">
             <div class="surface-head">
@@ -144,10 +144,9 @@ include '../includes/header.php';
     </div>
 </div>
 
-<div class="row g-3">
+<div class="row g-4 mb-4">
     <div class="col-lg-7">
-        <div class="surface-card">
-            <div class="surface-head">
+        <div class="surface-card h-100"> <div class="surface-head">
                 <h6>Transaksi Terbaru</h6>
                 <a href="../transaksi/index.php" class="select-filter" style="text-decoration:none;">Lihat Semua</a>
             </div>
@@ -181,8 +180,7 @@ include '../includes/header.php';
     </div>
 
     <div class="col-lg-5">
-        <div class="surface-card">
-            <div class="surface-head">
+        <div class="surface-card h-100"> <div class="surface-head">
                 <h6>Pelanggan Belanja Tertinggi</h6>
             </div>
 
