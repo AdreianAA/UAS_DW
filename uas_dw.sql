@@ -33,7 +33,7 @@ CREATE TABLE `dim_pelanggan` (
   `nama_pelanggan` varchar(100) DEFAULT NULL,
   `jenis_kelamin` enum('L','P') DEFAULT NULL,
   `kota` varchar(50) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data untuk tabel `dim_pelanggan`
@@ -111,7 +111,7 @@ CREATE TABLE `fact_penjualan` (
   `jumlah` int DEFAULT NULL,
   `harga_satuan` decimal(10,2) DEFAULT NULL,
   `total_harga` decimal(10,2) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=COLLATE=utf8mb4_0900_ai_ci; 
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data untuk tabel `fact_penjualan`
